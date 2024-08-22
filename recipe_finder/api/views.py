@@ -25,6 +25,8 @@ class RecipeDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class RecipeCreateView(APIView):
     def post(self, request):
+        if not self.request.user.is_authenticated:
+            return Response({'message': 'You must be logged in to create a recipe'}, status=status.HTTP_401_UNAUTHORIZED)
         serializer = RecipeSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -33,6 +35,8 @@ class RecipeCreateView(APIView):
     
 class IngredientCreateView(APIView):
     def post(self, request):
+        if not self.request.user.is_authenticated:
+            return Response({'message': 'You must be logged in to create an ingredient'}, status=status.HTTP_401_UNAUTHORIZED)
         serializer = IngredientSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
