@@ -3,12 +3,12 @@ from rest_framework import generics
 from .models import Ingredient, Recipe
 from .serializers import IngredientSerializer, RecipeSerializer
 
-# List and Create View
-class IngredientListCreateView(generics.ListCreateAPIView):
+# List View
+class IngredientListView(generics.ListAPIView):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     
-class RecipeListCreateView(generics.ListCreateAPIView):
+class RecipeListView(generics.ListAPIView):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
