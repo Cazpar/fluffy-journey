@@ -10,13 +10,25 @@ const App = () => {
     return (
         <div>
             <Router>
+                <nav>
+                    <ul>
+                        <li>
+                            <Link to="/">Home</Link>
+                        </li>
+                        <li>
+                            <Link to="/login">Login</Link>
+                        </li>
+                        <li>
+                            <Link to="/register">Register</Link>
+                        </li>
+                    </ul>
+                </nav>
                 <Routes>
-                    <Route path="/" element={<HomePage /> } />
-                    <Route path="/login" element={ <LoginPage /> } />
-                    <Route path="/register" element={ <RegisterPage /> } />
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
                 </Routes>
             </Router>
-            {/* <HomePage /> */}
         </div>
     );
 };
