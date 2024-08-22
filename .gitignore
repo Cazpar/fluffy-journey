@@ -8,3 +8,4 @@ __pycache__/
 recipe_finder/frontend/node_modules/
 /build/
 .DS_Store
+recipe_finder/frontend/static/frontend/*
