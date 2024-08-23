@@ -42,3 +42,20 @@ class IngredientCreateView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class SearchView(APIView):
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q', '')
+
+        # Search for recipes based on title
+        recipes = Recipe.objects.filter(title__icontains=query)
+        ingredients = Ingredient.objects.filter(name__icontains=query)
+
+        recipe_serializer = RecipeSerializer(recipes, many=True)
+        ingredient_serializer = IngredientSerializer(ingredients, many=True)
+
+        return Response({
+            'recipes': recipe_serializer.data,
+            'ingredients': ingredient_serializer.data
+        })
+
