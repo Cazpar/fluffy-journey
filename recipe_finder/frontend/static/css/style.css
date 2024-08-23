@@ -98,4 +98,49 @@ body {
       width: 90%;
     }
   }
+
+  /* Search Form Styles */
+.search-form {
+    max-width: 600px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-form .form-control {
+    border-radius: 20px;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    box-shadow: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .search-form .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
+  }
+  
+  .search-form .btn-primary {
+    margin-left: 10px;
+    border-radius: 20px;
+  }
+  
+  /* Search Results Styles */
+  .search-results {
+    max-width: 600px;
+    margin: 20px auto;
+  }
+  
+  .result-card {
+    margin-bottom: 15px;
+  }
+  
+  .result-card .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  .result-card .card-text {
+    color: #6c757d;
+  }
   

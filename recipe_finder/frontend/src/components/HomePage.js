@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Container from 'react-bootstrap/Container';
-import Navbar from 'react-bootstrap/Navbar';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import CustomNavbar from './NavBar';
+import AuthForm from './AuthForm';
+import Search from './Search';
+import Results from './SearchResults';
 
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
@@ -14,141 +14,108 @@ const client = axios.create({
 });
 
 function HomePage() {
-  const [currentUser, setCurrentUser] = useState();
-  const [showForms, setShowForms] = useState(false); 
+  const [currentUser, setCurrentUser] = useState(null); // `null` means loading
   const [registrationToggle, setRegistrationToggle] = useState(false);
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [results, setResults] = useState([]);
 
   useEffect(() => {
     client.get("/users/user")
-      .then(() => setCurrentUser(true))
-      .catch(() => setCurrentUser(false));
+      .then(function(res) {
+        setCurrentUser(true);
+      })
+      .catch(function(error) {
+        setCurrentUser(false);
+      });
   }, []);
 
-  function handleToggleForms() {
-    setShowForms(prevState => !prevState);
-  }
-
-  function update_form_btn() {
-    setRegistrationToggle(prevState => !prevState);
+  function updateFormButton() {
+    setRegistrationToggle(prev => !prev);
   }
 
   function submitRegistration(e) {
     e.preventDefault();
-    client.post("/users/register", {
-      email: email,
-      username: username,
-      password: password
-    })
-    .then(() => {
-      return client.post("/users/login", {
-        email: email,
-        password: password
-      });
-    })
-    .then(() => setCurrentUser(true));
+    client.post(
+      "/users/register",
+      { email, username, password }
+    ).then(() => {
+      client.post(
+        "/users/login",
+        { email, password }
+      ).then(() => setCurrentUser(true));
+    });
   }
 
   function submitLogin(e) {
     e.preventDefault();
-    client.post("/users/login", {
-      email: email,
-      password: password
-    })
-    .then(() => setCurrentUser(true));
+    client.post(
+      "/users/login",
+      { email, password }
+    ).then(() => setCurrentUser(true));
   }
 
   function submitLogout(e) {
     e.preventDefault();
-    client.post("/users/logout", {withCredentials: true})
-    .then(() => setCurrentUser(false));
+    client.post(
+      "/users/logout",
+      { withCredentials: true }
+    ).then(() => setCurrentUser(false));
   }
 
-  if (currentUser) {
-    return (
-      <div>
-        <Navbar bg="dark" variant="dark">
-          <Container>
-            <Navbar.Brand>Recipe Finder</Navbar.Brand>
-            <Navbar.Toggle />
-            <Navbar.Collapse className="justify-content-end">
-              <Navbar.Text>
-                <form onSubmit={e => submitLogout(e)}>
-                  <Button type="submit" variant="light">Log out</Button>
-                </form>
-              </Navbar.Text>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
-        <div className="center">
-          <h2>You're logged in!</h2>
-        </div>
-      </div>
-    );
+  function handleSearch(e) {
+    e.preventDefault();
+    client.get(`/search?query=${searchQuery}`)
+      .then(function(res) {
+        setResults(res.data);
+      })
+      .catch(function(error) {
+        console.error("Error fetching search results:", error);
+      });
+  }
+
+  if (currentUser === null) {
+    return <div>Loading...</div>;
   }
 
   return (
     <div>
-      <Navbar bg="dark" variant="dark">
-        <Container>
-          <Navbar.Brand>Recipe Finder</Navbar.Brand>
-          <Navbar.Toggle />
-          <Navbar.Collapse className="justify-content-end">
-            <Navbar.Text>
-              <Button onClick={handleToggleForms} variant="light">
-                {showForms ? "Close" : "Register / Login"}
-              </Button>
-            </Navbar.Text>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-      {showForms && (
-        <div className="center">
-          {registrationToggle ? (
-            <div className="form-container">
-              <Form onSubmit={e => submitRegistration(e)}>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                  <Form.Label>Email address</Form.Label>
-                  <Form.Control type="email" placeholder="Enter email" value={email} onChange={e => setEmail(e.target.value)} />
-                  <Form.Text className="text-muted">
-                    We'll never share your email with anyone else.
-                  </Form.Text>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicUsername">
-                  <Form.Label>Username</Form.Label>
-                  <Form.Control type="text" placeholder="Enter username" value={username} onChange={e => setUsername(e.target.value)} />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-                </Form.Group>
-                <Button variant="primary" type="submit">Submit</Button>
-              </Form>
-            </div>
-          ) : (
-            <div className="form-container">
-              <Form onSubmit={e => submitLogin(e)}>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                  <Form.Label>Email address</Form.Label>
-                  <Form.Control type="email" placeholder="Enter email" value={email} onChange={e => setEmail(e.target.value)} />
-                  <Form.Text className="text-muted">
-                    We'll never share your email with anyone else.
-                  </Form.Text>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                  <Form.Label>Password</Form.Label>
-                  <Form.Control type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-                </Form.Group>
-                <Button variant="primary" type="submit">Submit</Button>
-              </Form>
-            </div>
-          )}
-          <Button onClick={update_form_btn} variant="light">
-            {registrationToggle ? "Switch to Login" : "Switch to Register"}
-          </Button>
-        </div>
+      <CustomNavbar
+        currentUser={currentUser}
+        onToggleForm={updateFormButton}
+        onLogout={submitLogout}
+      />
+      <Search
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onSearch={handleSearch}
+      />
+      <Results results={results} />
+      {!currentUser && registrationToggle && (
+        <AuthForm
+          isRegistering={true}
+          email={email}
+          username={username}
+          password={password}
+          setEmail={setEmail}
+          setUsername={setUsername}
+          setPassword={setPassword}
+          onSubmit={submitRegistration}
+        />
+      )}
+      {!currentUser && !registrationToggle && (
+        <AuthForm
+          isRegistering={false}
+          email={email}
+          username={username}
+          password={password}
+          setEmail={setEmail}
+          setUsername={setUsername}
+          setPassword={setPassword}
+          onSubmit={submitLogin}
+        />
       )}
     </div>
   );
