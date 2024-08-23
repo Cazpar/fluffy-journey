@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import IngredientListView, IngredientDetailView, RecipeListView, RecipeDetailView, SearchView
+from .views import *
 
 
 urlpatterns = [
